@@ -1,10 +1,39 @@
-import React from 'react';
+import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import { Table } from 'react-bootstrap';
 
 const Ships = props => {
+  const [ships, setShips] = useState([]);
+  useEffect(() => {
+    async function fetchShips() {
+      let result = await axios.get('http://localhost:8080/ships');
+      setShips(result.data);
+    }
+    fetchShips();
+  }, []);
   return (
-    <div className='mt-5 d-flex justify-content-left'>
-      <h3>This is the Ships page</h3>
-    </div>
+    <Table className='mt-4' striped bordered hover size='small'>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Length (metres)</th>
+          <th>Width (metres)</th>
+          <th>Code</th>
+        </tr>
+      </thead>
+      <tbody>
+        {ships.map(ship => (
+          <tr key={ship.id}>
+            <td>{ship.id}</td>
+            <td>{ship.name}</td>
+            <td>{ship.length}</td>
+            <td>{ship.width}</td>
+            <td>{ship.code}</td>
+          </tr>
+        ))}
+      </tbody>
+    </Table>
   );
 };
 
