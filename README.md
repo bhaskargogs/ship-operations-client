@@ -1,4 +1,4 @@
-# Getting Started with Create React App
+# Ship Operations Client
 
 A ReactJS Online Ship Service to perform CRUD operations on a Ship. The server side code is available in this [link](https://github.com/bhaskargogs/ship-operations-server)
 
