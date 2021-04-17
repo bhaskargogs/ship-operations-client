@@ -1,3 +1,4 @@
+import { IconButton, Snackbar } from '@material-ui/core';
 import axios from 'axios';
 import React, { useState } from 'react'
 import { Modal, Button, Row, Col, Form } from 'react-bootstrap';
@@ -5,8 +6,13 @@ import { Modal, Button, Row, Col, Form } from 'react-bootstrap';
 
 
 const CreateShipModal = props => {
-    const [ form, setForm ] = useState({})
-    const [ errors, setErrors ] = useState({})
+    const [ form, setForm ] = useState({});
+    const [ errors, setErrors ] = useState({});
+    const [snackBarOpen, isSnackBarOpen] = useState(false);
+    const [snackBarMsg, setSnackBarMsg] = useState('');
+
+    const snackBarClose = event => isSnackBarOpen(false);
+
     const handleSubmit = async (event) => {
         event.preventDefault();
         const newErrors = findFormErrors()
@@ -22,7 +28,8 @@ const CreateShipModal = props => {
                 width: event.target.width.value,
                 code: event.target.code.value
              });
-             alert('')
+             isSnackBarOpen(true);
+             setSnackBarMsg(result.data);
         }
     }
     const setField = (field, value) => {
@@ -47,6 +54,19 @@ const CreateShipModal = props => {
     }
 
     return (
+        <div className="container">
+        <Snackbar anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
+        open={snackBarOpen}
+        autoHideDuration={3000}
+        onClose={snackBarClose}
+        message={<span id="message-id">{snackBarMsg}</span>}
+        action={[
+            <IconButton 
+                key="close" 
+                aria-label="Close" 
+                color="inherit" 
+                onClick={snackBarClose}>x</IconButton>
+        ]} />
         <Modal
       {...props}
       size="lg"
@@ -59,7 +79,6 @@ const CreateShipModal = props => {
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <div className="container">
         <Row>
             <Col sm={6}>
                 <Form onSubmit={handleSubmit}>
@@ -121,12 +140,12 @@ const CreateShipModal = props => {
                 </Form>
             </Col>
         </Row>
-        </div>
       </Modal.Body>
       <Modal.Footer>
         <Button variant="danger" onClick={props.onHide}>Close</Button>
       </Modal.Footer>
     </Modal>
+    </div>
     );
 }
 
