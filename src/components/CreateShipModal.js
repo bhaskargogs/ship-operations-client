@@ -20,6 +20,8 @@ const CreateShipModal = props => {
         if ( Object.keys(newErrors).length > 0 ) {
       // We got errors!
             setErrors(newErrors)
+            isSnackBarOpen(true);
+            setSnackBarMsg('Failed due to validation errors');
         } else {
             let result = await axios.post("http://localhost:8080/ships", 
             { 
@@ -30,6 +32,7 @@ const CreateShipModal = props => {
              });
              isSnackBarOpen(true);
              setSnackBarMsg(result.data);
+             props.onHide();
         }
     }
     const setField = (field, value) => {
