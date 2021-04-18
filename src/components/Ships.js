@@ -17,7 +17,6 @@ const Ships = props => {
 
   const fetchShips = async () => {
     const response = await axios.get('http://localhost:8080/ships');
-
     setShips(response.data);
   };
 

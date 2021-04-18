@@ -1,61 +1,79 @@
-import React, { useState } from 'react';
 import { IconButton, Snackbar } from '@material-ui/core';
 import axios from 'axios';
-import { Modal, Button, Row, Col, Form } from 'react-bootstrap';
+import { useFormik } from 'formik';
+import React, { useState } from 'react';
+import { Button, Col, Form, Modal, Row } from 'react-bootstrap';
 
 const EditShipModal = props => {
-  const [form, setForm] = useState({});
-  const [errors, setErrors] = useState({});
   const [snackBarOpen, isSnackBarOpen] = useState(false);
   const [snackBarMsg, setSnackBarMsg] = useState('');
+  const [validateOnChange, setValidateOnChange] = useState(false);
 
-  const snackBarClose = event => isSnackBarOpen(false);
+  const snackBarClose = () => isSnackBarOpen(false);
 
-  const handleSubmit = async event => {
-    event.preventDefault();
-    const newErrors = findFormErrors();
-    // Conditional logic:
-    if (Object.keys(newErrors).length > 0) {
-      // We got errors!
-      setErrors(newErrors);
-      isSnackBarOpen(true);
-      setSnackBarMsg('Failed due to validation errors');
-    } else {
-      let result = await axios.put(
-        `http://localhost:8080/ships/${event.target.id.value}`,
-        {
-          id: event.target.id.value,
-          name: event.target.name.value,
-          length: event.target.length.value,
-          width: event.target.width.value,
-          code: event.target.code.value,
-        }
-      );
+  const validate = values => {
+    const errors = {};
+    if (!values.name) {
+      errors.name = 'Name is required';
+    }
+
+    if (!values.length) {
+      errors.length = 'Length (metres) is required';
+    } else if (!/^[0-9]*\.?[0-9]*$/.test(values.length)) {
+      errors.length = 'Length (metres) is not valid';
+    }
+
+    if (!values.width) {
+      errors.width = 'Width (width) is required';
+    } else if (!/^[0-9]*\.?[0-9]*$/.test(values.width)) {
+      errors.width = 'Width (metres) is not valid';
+    }
+
+    if (!values.code) {
+      errors.code = 'Code is required';
+    } else if (
+      !/^[A-Z]{4}-\d{4}-[A-Z]{1}\d{1}/.test(values.code) ||
+      values.code.length > 12
+    ) {
+      errors.code = 'Code is not valid';
+    }
+
+    return errors;
+  };
+
+  const handleValidationError = () => {
+    isSnackBarOpen(true);
+    setSnackBarMsg('Failed due to validation errors');
+  };
+
+  const formik = useFormik({
+    enableReinitialize: true,
+    validateOnChange,
+    initialValues: {
+      id: props.shipid,
+      name: props.name,
+      length: props.length,
+      width: props.width,
+      code: props.code,
+    },
+    validate,
+    onSubmit: async values => {
+      let result = await axios.put(`http://localhost:8080/ships/${values.id}`, {
+        id: values.id,
+        name: values.name,
+        length: values.length,
+        width: values.width,
+        code: values.code,
+      });
       isSnackBarOpen(true);
       setSnackBarMsg(result.data);
       props.onHide();
-    }
-  };
+    },
+  });
 
-  const setField = (field, value) => {
-    setForm({
-      ...form,
-      [field]: value,
-    });
-  };
-
-  const findFormErrors = () => {
-    const { length, width, code } = form;
-    const newErrors = {};
-    const expr = /^[0-9]*\.?[0-9]*$/;
-    // length errors
-    if (!expr.test(length)) newErrors.length = 'Length is not valid!';
-    if (!expr.test(width)) newErrors.width = 'Width is not valid!';
-    const codeExpr = /^[A-Z]{4}-\d{4}-[A-Z]{1}\d{1}/;
-    if (!codeExpr.test(code))
-      newErrors.code = 'Code is not valid (format: AAAA-0000-A0)!';
-
-    return newErrors;
+  const formSubmit = e => {
+    setValidateOnChange(true);
+    return formik.isValid ? formik.handleSubmit(e) : handleValidationError(e);
   };
 
   return (
@@ -91,14 +109,14 @@ const EditShipModal = props => {
         <Modal.Body>
           <Row>
             <Col sm={6}>
-              <Form onSubmit={handleSubmit}>
+              <Form onSubmit={formSubmit}>
                 <Form.Group controlId='id'>
                   <Form.Label>ID</Form.Label>
                   <Form.Control
                     type='text'
                     name='id'
                     required
-                    defaultValue={props.shipid}
+                    defaultValue={formik.values.id}
                     disabled
                     placeholder='ID'
                   />
@@ -108,60 +126,72 @@ const EditShipModal = props => {
                   <Form.Control
                     type='text'
                     name='name'
-                    onChange={e => setField('name', e.target.value)}
                     required
-                    defaultValue={props.name}
-                    isInvalid={!!errors.name}
+                    onChange={formik.handleChange}
+                    value={formik.values.name}
+                    // defaultValue={formik.values.name}
                     placeholder='Name'
+                    isInvalid={!!formik.errors.name}
                   />
-                  <Form.Control.Feedback type='invalid'>
-                    {errors.name}
-                  </Form.Control.Feedback>
+                  {formik.errors.name && (
+                    <Form.Control.Feedback type='invalid'>
+                      {formik.errors.name}
+                    </Form.Control.Feedback>
+                  )}
                 </Form.Group>
                 <Form.Group controlId='Length'>
                   <Form.Label>Length (metres)</Form.Label>
                   <Form.Control
                     type='text'
                     name='length'
-                    onChange={e => setField('length', e.target.value)}
+                    onChange={formik.handleChange}
                     required
-                    defaultValue={props.length}
-                    isInvalid={!!errors.length}
+                    value={formik.values.length}
+                    // defaultValue={formik.values.length}
                     placeholder='Length'
+                    isInvalid={!!formik.errors.length}
                   />
-                  <Form.Control.Feedback type='invalid'>
-                    {errors.length}
-                  </Form.Control.Feedback>
+                  {formik.errors.length && (
+                    <Form.Control.Feedback type='invalid'>
+                      {formik.errors.length}
+                    </Form.Control.Feedback>
+                  )}
                 </Form.Group>
                 <Form.Group controlId='Width'>
                   <Form.Label>Width (metres)</Form.Label>
                   <Form.Control
                     type='text'
                     name='width'
-                    onChange={e => setField('width', e.target.value)}
+                    onChange={formik.handleChange}
                     required
-                    defaultValue={props.width}
-                    isInvalid={!!errors.width}
+                    value={formik.values.width}
+                    // defaultValue={formik.values.width}
                     placeholder='Width'
+                    isInvalid={!!formik.errors.width && !!formik.touched.width}
                   />
-                  <Form.Control.Feedback type='invalid'>
-                    {errors.width}
-                  </Form.Control.Feedback>
+                  {formik.errors.width && (
+                    <Form.Control.Feedback type='invalid'>
+                      {formik.errors.width}
+                    </Form.Control.Feedback>
+                  )}
                 </Form.Group>
                 <Form.Group controlId='Code'>
                   <Form.Label>Code (AAAA-0000-A0)</Form.Label>
                   <Form.Control
                     type='text'
                     name='code'
-                    defaultValue={props.code}
-                    onChange={e => setField('code', e.target.value)}
+                    onChange={formik.handleChange}
+                    value={formik.values.code}
+                    // defaultValue={formik.values.code}
                     required
-                    isInvalid={!!errors.code}
                     placeholder='Code'
+                    isInvalid={!!formik.errors.code}
                   />
-                  <Form.Control.Feedback type='invalid'>
-                    {errors.code}
-                  </Form.Control.Feedback>
+                  {formik.errors.code && (
+                    <Form.Control.Feedback type='invalid'>
+                      {formik.errors.code}
+                    </Form.Control.Feedback>
+                  )}
                 </Form.Group>
                 <Form.Group>
                   <Button variant='primary' type='submit'>
