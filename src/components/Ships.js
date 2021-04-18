@@ -20,6 +20,12 @@ const Ships = props => {
     setShips(response.data);
   };
 
+  const deleteShip = async shipid => {
+    if (window.confirm('Are you sure?')) {
+      await axios.delete(`http://localhost:8080/ships/${shipid}`);
+    }
+  };
+
   useEffect(() => {
     fetchShips(ships);
   }, [ships]);
@@ -61,6 +67,13 @@ const Ships = props => {
                     setShipWidth(ship.width);
                     setShipCode(ship.code);
                   }}
+                />
+                <Icon
+                  name='delete'
+                  tooltip='Delete'
+                  theme='light'
+                  size='medium'
+                  onClick={() => deleteShip(ship.id)}
                 />
                 <EditShipModal
                   show={editShowModal}
