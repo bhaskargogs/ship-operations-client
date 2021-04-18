@@ -1,60 +1,79 @@
 import { IconButton, Snackbar } from '@material-ui/core';
 import axios from 'axios';
-import React, { useState } from 'react'
-import { Modal, Button, Row, Col, Form } from 'react-bootstrap';
-
-
+import { useFormik } from 'formik';
+import React, { useState } from 'react';
+import { Button, Col, Form, Modal, Row } from 'react-bootstrap';
 
 const CreateShipModal = props => {
-    const [ form, setForm ] = useState({});
-    const [ errors, setErrors ] = useState({});
     const [snackBarOpen, isSnackBarOpen] = useState(false);
     const [snackBarMsg, setSnackBarMsg] = useState('');
+    const [validateOnChange, setValidateOnChange] = useState(false);
 
     const snackBarClose = event => isSnackBarOpen(false);
 
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-        const newErrors = findFormErrors()
-    // Conditional logic:
-        if ( Object.keys(newErrors).length > 0 ) {
-      // We got errors!
-            setErrors(newErrors)
-            isSnackBarOpen(true);
-            setSnackBarMsg('Failed due to validation errors');
-        } else {
-            let result = await axios.post("http://localhost:8080/ships", 
+    const validate = values => {
+    const errors = {};
+    if (!values.name) {
+      errors.name = 'Name is required';
+    }
+
+    if (!values.length) {
+      errors.length = 'Length (metres) is required';
+    } else if (!/^[0-9]*\.?[0-9]*$/.test(values.length)) {
+      errors.length = 'Length (metres) is not valid';
+    }
+
+    if (!values.width) {
+      errors.width = 'Width (width) is required';
+    } else if (!/^[0-9]*\.?[0-9]*$/.test(values.width)) {
+      errors.width = 'Width (metres) is not valid';
+    }
+
+    if (!values.code) {
+      errors.code = 'Code is required';
+    } else if (
+      !/^[A-Z]{4}-\d{4}-[A-Z]{1}\d{1}/.test(values.code) ||
+      values.code.length > 12
+    ) {
+      errors.code = 'Code is not valid';
+    }
+
+    return errors;
+  };
+
+  const handleValidationError = () => {
+    isSnackBarOpen(true);
+    setSnackBarMsg('Failed due to validation errors');
+  };
+
+  const formik = useFormik({
+    enableReinitialize: true,
+    validateOnChange,
+    initialValues: {
+      name: '',
+      length: '',
+      width: '',
+      code: '',
+    },
+    validate,
+    onSubmit: async values => {
+        let result = await axios.post("http://localhost:8080/ships", 
             { 
-                name: event.target.name.value,
-                length: event.target.length.value,
-                width: event.target.width.value,
-                code: event.target.code.value
+                name: values.name,
+                length: values.length,
+                width: values.width,
+                code: values.code
              });
              isSnackBarOpen(true);
              setSnackBarMsg(result.data);
              props.onHide();
-        }
-    }
-    const setField = (field, value) => {
-    setForm({
-      ...form,
-      [field]: value
-    })
-  }
-  const findFormErrors = () => {
-    const { name, length, width, code } = form
-    const newErrors = {}
-    // name errors
-    if ( name.length > 50 ) newErrors.name = 'Name is too long!'
-    const expr = /^[0-9]*\.?[0-9]*$/
-    // length errors
-    if ( !expr.test(length) ) newErrors.length = 'Length is not valid!'
-    if ( !expr.test(width) ) newErrors.width = 'Width is not valid!'
-    const codeExpr = /^[A-Z]{4}-\d{4}-[A-Z]{1}\d{1}/
-    if ( !codeExpr.test(code) ) newErrors.code = 'Code is not valid (format: AAAA-0000-A0)!'
+    },
+  });
 
-    return newErrors
-    }
+  const formSubmit = e => {
+    setValidateOnChange(true);
+    return formik.isValid ? formik.handleSubmit(e) : handleValidationError(e);
+  };
 
     return (
         <div className="container">
@@ -84,58 +103,69 @@ const CreateShipModal = props => {
       <Modal.Body>
         <Row>
             <Col sm={6}>
-                <Form onSubmit={handleSubmit}>
+                <Form onSubmit={formSubmit}>
                     <Form.Group controlId="Name">
                         <Form.Label>Name</Form.Label>
                         <Form.Control 
                             type="text" 
                             name="name" 
-                            onChange={ e => setField('name', e.target.value) } 
+                            onChange={formik.handleChange} 
+                            value={formik.values.name}
                             required 
-                            isInvalid={ !!errors.name }
+                            isInvalid={ !!formik.errors.name }
                             placeholder="Name"/>
-                            <Form.Control.Feedback type='invalid'>
-                                { errors.name }
-                            </Form.Control.Feedback>
+                            {formik.errors.name && (
+                    <Form.Control.Feedback type='invalid'>
+                      {formik.errors.name}
+                    </Form.Control.Feedback>
+                  )}
                     </Form.Group>
                     <Form.Group controlId="Length">
                         <Form.Label>Length (metres)</Form.Label>
                         <Form.Control 
                             type="text" 
                             name="length" 
-                            onChange={ e => setField('length', e.target.value) } 
+                            onChange={formik.handleChange} 
+                            value={formik.values.length}
                             required 
-                            isInvalid={ !!errors.length }
+                            isInvalid={ !!formik.errors.length }
                             placeholder="Length"/>
-                            <Form.Control.Feedback type='invalid'>
-                                { errors.length }
-                            </Form.Control.Feedback>
+                            {formik.errors.length && (
+                    <Form.Control.Feedback type='invalid'>
+                      {formik.errors.length}
+                    </Form.Control.Feedback>
+                  )}
                     </Form.Group>
                     <Form.Group controlId="Width">
                         <Form.Label>Width (metres)</Form.Label>
                         <Form.Control 
                         type="text" 
                         name="width" 
-                        onChange={ e => setField('width', e.target.value) } 
+                        onChange={formik.handleChange} 
+                        value={formik.values.width}
                         required 
-                        isInvalid={ !!errors.width }
+                        isInvalid={ !!formik.errors.width }
                         placeholder="Width"/>
-                        <Form.Control.Feedback type='invalid'>
-                            { errors.width }
-                        </Form.Control.Feedback>
+                        {formik.errors.width && (
+                    <Form.Control.Feedback type='invalid'>
+                      {formik.errors.width}
+                    </Form.Control.Feedback>
+                  )}
                     </Form.Group>
                     <Form.Group controlId="Code">
                         <Form.Label>Code (AAAA-0000-A0)</Form.Label>
                         <Form.Control 
                         type="text" 
                         name="code" 
-                        onChange={ e => setField('code', e.target.value) } 
+                        onChange={formik.handleChange} 
                         required 
-                        isInvalid={ !!errors.code }
+                        isInvalid={ !!formik.errors.code }
                         placeholder="Code"/>
-                        <Form.Control.Feedback type='invalid'>
-                            { errors.code }
-                        </Form.Control.Feedback>
+                    {formik.errors.code && (
+                    <Form.Control.Feedback type='invalid'>
+                      {formik.errors.code}
+                    </Form.Control.Feedback>
+                  )}
                     </Form.Group>
                     <Form.Group>
                         <Button variant="primary" type="submit">Create Ship</Button>

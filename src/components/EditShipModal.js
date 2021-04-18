@@ -129,7 +129,6 @@ const EditShipModal = props => {
                     required
                     onChange={formik.handleChange}
                     value={formik.values.name}
-                    // defaultValue={formik.values.name}
                     placeholder='Name'
                     isInvalid={!!formik.errors.name}
                   />
@@ -147,7 +146,6 @@ const EditShipModal = props => {
                     onChange={formik.handleChange}
                     required
                     value={formik.values.length}
-                    // defaultValue={formik.values.length}
                     placeholder='Length'
                     isInvalid={!!formik.errors.length}
                   />
@@ -165,9 +163,8 @@ const EditShipModal = props => {
                     onChange={formik.handleChange}
                     required
                     value={formik.values.width}
-                    // defaultValue={formik.values.width}
                     placeholder='Width'
-                    isInvalid={!!formik.errors.width && !!formik.touched.width}
+                    isInvalid={!!formik.errors.width}
                   />
                   {formik.errors.width && (
                     <Form.Control.Feedback type='invalid'>
@@ -182,7 +179,6 @@ const EditShipModal = props => {
                     name='code'
                     onChange={formik.handleChange}
                     value={formik.values.code}
-                    // defaultValue={formik.values.code}
                     required
                     placeholder='Code'
                     isInvalid={!!formik.errors.code}
