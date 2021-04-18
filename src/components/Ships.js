@@ -2,20 +2,31 @@ import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { ButtonToolbar, Button, Table } from 'react-bootstrap';
 import CreateShipModal from './CreateShipModal';
+import Icon from 'react-crud-icons';
+import EditShipModal from './EditShipModal';
 
 const Ships = props => {
   const [ships, setShips] = useState([]);
-  const [addShowModal, setAddShowModal] = useState(false);
+  const [shipID, setShipId] = useState('');
+  const [shipName, setShipName] = useState('');
+  const [shipLength, setShipLength] = useState(0);
+  const [shipWidth, setShipWidth] = useState(0);
+  const [shipCode, setShipCode] = useState('');
+  const [createShowModal, setCreateShowModal] = useState(false);
+  const [editShowModal, setEditShowModal] = useState(false);
+
   const fetchShips = async () => {
     const response = await axios.get('http://localhost:8080/ships');
 
     setShips(response.data);
   };
 
-  useEffect(() => { fetchShips(ships) }, [ ships ]);
+  useEffect(() => {
+    fetchShips(ships);
+  }, [ships]);
 
-  let onModalClose = () => setAddShowModal(false);
-
+  let createModalClose = () => setCreateShowModal(false);
+  let editModalClose = () => setEditShowModal(false);
   return (
     <div>
       <Table className='mt-4' striped bordered hover size='small'>
@@ -26,6 +37,7 @@ const Ships = props => {
             <th>Length (metres)</th>
             <th>Width (metres)</th>
             <th>Code</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody>
@@ -36,15 +48,40 @@ const Ships = props => {
               <td>{ship.length}</td>
               <td>{ship.width}</td>
               <td>{ship.code}</td>
+              <td>
+                <Icon
+                  name='edit'
+                  tooltip='Edit'
+                  theme='light'
+                  size='medium'
+                  onClick={() => {
+                    setEditShowModal(true);
+                    setShipId(ship.id);
+                    setShipName(ship.name);
+                    setShipLength(ship.length);
+                    setShipWidth(ship.width);
+                    setShipCode(ship.code);
+                  }}
+                />
+                <EditShipModal
+                  show={editShowModal}
+                  onHide={editModalClose}
+                  shipid={shipID}
+                  name={shipName}
+                  length={shipLength}
+                  width={shipWidth}
+                  code={shipCode}
+                />
+              </td>
             </tr>
           ))}
         </tbody>
       </Table>
       <ButtonToolbar>
-        <Button variant='primary' onClick={() => setAddShowModal(true)}>
+        <Button variant='primary' onClick={() => setCreateShowModal(true)}>
           Create Ship
         </Button>
-        <CreateShipModal show={addShowModal} onHide={onModalClose} />
+        <CreateShipModal show={createShowModal} onHide={createModalClose} />
       </ButtonToolbar>
     </div>
   );
