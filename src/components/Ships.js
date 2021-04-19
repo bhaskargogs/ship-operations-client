@@ -1,12 +1,20 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import axios from 'axios';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { ButtonToolbar, Button, Table } from 'react-bootstrap';
 import CreateShipModal from './CreateShipModal';
 import Icon from 'react-crud-icons';
 import EditShipModal from './EditShipModal';
+import Header from './Table/Header';
+import PaginationComponent from './Table/Pagination';
 
 const Ships = props => {
   const [ships, setShips] = useState([]);
+  const [totalShips, setTotalShips] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [shipsPerPage, setShipsPerPage] = useState(20);
+  const [direction, setDirection] = useState('asc');
+  const [sortField, setSortField] = useState('id');
   const [shipID, setShipId] = useState('');
   const [shipName, setShipName] = useState('');
   const [shipLength, setShipLength] = useState(0);
@@ -15,9 +23,25 @@ const Ships = props => {
   const [createShowModal, setCreateShowModal] = useState(false);
   const [editShowModal, setEditShowModal] = useState(false);
 
+  const headers = [
+    { name: 'ID', field: 'id' },
+    { name: 'Name', field: 'name' },
+    { name: 'Length (metres)', field: 'length' },
+    { name: 'Width (metres)', field: 'width' },
+    { name: 'Code', field: 'code' },
+  ];
+
   const fetchShips = async () => {
-    const response = await axios.get('http://localhost:8080/ships');
-    setShips(response.data);
+    const response = await axios.get('http://localhost:8080/ships', {
+      params: {
+        pageNo: currentPage - 1,
+        pageSize: shipsPerPage,
+        sort: sortField,
+        direction: direction,
+      },
+    });
+    setShips(response.data.ships);
+    setTotalShips(response.data.totalShips);
   };
 
   const deleteShip = async shipid => {
@@ -30,23 +54,38 @@ const Ships = props => {
     fetchShips(ships);
   }, [ships]);
 
+  const shipData = useMemo(() => {
+    let computedShips = ships;
+
+    // return computedShips.slice(
+    //   (currentPage - 1) * shipsPerPage,
+    //   (currentPage - 1) * shipsPerPage + shipsPerPage
+    // );
+    return computedShips;
+  }, [ships]);
+
   let createModalClose = () => setCreateShowModal(false);
   let editModalClose = () => setEditShowModal(false);
   return (
     <div>
+      <div className='row mt-4'>
+        <div className='col-md-6'>
+          <PaginationComponent
+            total={totalShips}
+            itemsPerPage={shipsPerPage}
+            currentPage={currentPage}
+            onPageChange={page => {
+              setCurrentPage(page);
+              fetchShips();
+            }}
+          />
+        </div>
+        <div className='col-md-6'></div>
+      </div>
       <Table className='mt-4' striped bordered hover size='small'>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Length (metres)</th>
-            <th>Width (metres)</th>
-            <th>Code</th>
-            <th>Action</th>
-          </tr>
-        </thead>
+        <Header headers={headers} />
         <tbody>
-          {ships.map(ship => (
+          {shipData.map(ship => (
             <tr key={ship.id}>
               <td>{ship.id}</td>
               <td>{ship.name}</td>
