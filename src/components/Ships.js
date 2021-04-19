@@ -12,7 +12,7 @@ const Ships = props => {
   const [ships, setShips] = useState([]);
   const [totalShips, setTotalShips] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [shipsPerPage, setShipsPerPage] = useState(20);
+  const [shipsPerPage] = useState(20);
   const [direction, setDirection] = useState('asc');
   const [sortField, setSortField] = useState('id');
   const [shipID, setShipId] = useState('');
@@ -24,11 +24,12 @@ const Ships = props => {
   const [editShowModal, setEditShowModal] = useState(false);
 
   const headers = [
-    { name: 'ID', field: 'id' },
-    { name: 'Name', field: 'name' },
-    { name: 'Length (metres)', field: 'length' },
-    { name: 'Width (metres)', field: 'width' },
-    { name: 'Code', field: 'code' },
+    { name: 'ID', field: 'id', sortable: true },
+    { name: 'Name', field: 'name', sortable: true },
+    { name: 'Length (metres)', field: 'length', sortable: true },
+    { name: 'Width (metres)', field: 'width', sortable: true },
+    { name: 'Code', field: 'code', sortable: true },
+    { name: 'Action', field: 'action', sortable: false },
   ];
 
   const fetchShips = async () => {
@@ -57,10 +58,6 @@ const Ships = props => {
   const shipData = useMemo(() => {
     let computedShips = ships;
 
-    // return computedShips.slice(
-    //   (currentPage - 1) * shipsPerPage,
-    //   (currentPage - 1) * shipsPerPage + shipsPerPage
-    // );
     return computedShips;
   }, [ships]);
 
@@ -83,7 +80,14 @@ const Ships = props => {
         <div className='col-md-6'></div>
       </div>
       <Table className='mt-4' striped bordered hover size='small'>
-        <Header headers={headers} />
+        <Header
+          headers={headers}
+          onSorting={(field, order) => {
+            setDirection(order);
+            setSortField(field);
+            fetchShips();
+          }}
+        />
         <tbody>
           {shipData.map(ship => (
             <tr key={ship.id}>
