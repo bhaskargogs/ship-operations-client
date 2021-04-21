@@ -16,6 +16,7 @@
     "axios": "^0.21.1",
     "bootstrap": "^4.6.0",
     "formik": "^2.2.6",
+
     "react": "^17.0.2",
     "react-bootstrap": "^1.5.2",
     "react-bootstrap-table-next": "^4.0.3",
@@ -28,11 +29,9 @@
     "web-vitals": "^1.0.1"
   },
   "scripts": {
-    "cypress": "cypress open",
     "start": "react-scripts start",
-    "test": "react-scripts test --env=jest-environment-jsdom-sixteen",
-    "test:coverage:integration": "react-scripts test --watchAll=false --env=jest-environment-jsdom-sixteen --coverage --testPathPattern=\"integration.test.js\" --verbose",
-    "test:coverage:unit": "react-scripts test --watchAll=false --env=jest-environment-jsdom-sixteen --coverage --testPathPattern=\"unit.test.js\" --verbose"
+    "test": "react-scripts test --watchAll=false --env=jest-environment-jsdom-sixteen",
+    "integration": "react-scripts test --watchAll=false --env=jest-environment-jsdom-sixteen  --testPathPattern=\"integration.test.js\" --verbose"
   },
   "eslintConfig": {
     "extends": [
