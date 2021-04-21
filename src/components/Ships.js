@@ -13,8 +13,8 @@ const Ships = props => {
   const [totalShips, setTotalShips] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [shipsPerPage] = useState(20);
-  const [direction, setDirection] = useState('asc');
-  const [sortField, setSortField] = useState('id');
+  const [direction, setDirection] = useState('');
+  const [sortField, setSortField] = useState('');
   const [shipID, setShipId] = useState('');
   const [shipName, setShipName] = useState('');
   const [shipLength, setShipLength] = useState(0);
@@ -32,19 +32,6 @@ const Ships = props => {
     { name: 'Action', field: 'action', sortable: false },
   ];
 
-  const fetchShips = async () => {
-    const response = await axios.get('http://localhost:8080/ships', {
-      params: {
-        pageNo: currentPage - 1,
-        pageSize: shipsPerPage,
-        sort: sortField,
-        direction: direction,
-      },
-    });
-    setShips(response.data.ships);
-    setTotalShips(response.data.totalShips);
-  };
-
   const deleteShip = async shipid => {
     if (window.confirm('Are you sure?')) {
       await axios.delete(`http://localhost:8080/ships/${shipid}`);
@@ -52,14 +39,39 @@ const Ships = props => {
   };
 
   useEffect(() => {
-    fetchShips(ships);
-  }, [ships]);
+    async function fetchShips(event) {
+      const response = await axios.get('http://localhost:8080/ships', {
+        params: {
+          pageNo: currentPage - 1,
+          pageSize: shipsPerPage,
+          sort: sortField || 'id',
+          direction: direction || 'asc',
+        },
+      });
+      setShips(response.data.ships);
+      setTotalShips(response.data.totalShips);
+    }
+
+    fetchShips();
+  });
 
   const shipData = useMemo(() => {
     let computedShips = ships;
 
+    if (sortField) {
+      computedShips = computedShips.sort((a, b) => {
+        if (a[sortField] < b[sortField]) {
+          return direction === 'asc' ? -1 : 1;
+        }
+        if (a[sortField] > b[sortField]) {
+          return direction === 'asc' ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+
     return computedShips;
-  }, [ships]);
+  }, [ships, sortField, direction]);
 
   let createModalClose = () => setCreateShowModal(false);
   let editModalClose = () => setEditShowModal(false);
@@ -74,7 +86,6 @@ const Ships = props => {
             currentPage={currentPage}
             onPageChange={page => {
               setCurrentPage(page);
-              fetchShips();
             }}
           />
         </div>
@@ -84,9 +95,10 @@ const Ships = props => {
         <Header
           headers={headers}
           onSorting={(field, order) => {
-            setDirection(order);
-            setSortField(field);
-            fetchShips();
+            setTimeout(() => {
+              setDirection(order);
+              setSortField(field);
+            }, 3000);
           }}
         />
         <tbody>
