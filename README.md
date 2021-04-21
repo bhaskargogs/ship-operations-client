@@ -1,20 +1,63 @@
 # Ship Operations Client
 
-A ReactJS Online Ship Service to perform CRUD operations on a Ship. The server side code is available in this [link](https://github.com/bhaskargogs/ship-operations-server)
+A ReactJS Online Ship Service to perform CRUD operations on a Ship. 
 
-## Available Scripts
+The server side code is available in this [link](https://github.com/bhaskargogs/ship-operations-server)
 
-In the project directory, you can run:
+# Tools used
+* NodeJS and npm
+* Yarn
+* ReactJS
+* Jest
+* Bootstrap
+* Material UI
 
-### `yarn start`
+# Installations
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+# NodeJS
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+Please follow this **[link](https://nodejs.org/en/download/)** to install NodeJS and npm. 
 
-### `yarn test`
+# Yarn installation
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Yarn is necessary for this project as this project was installed with `create-react-app`.
+
+```
+npm install -g yarn
+```
+
+# Setup and Build
+
+Clone the repository to your workspace
+
+```shell
+git clone https://github.com/bhaskargogs/ship-operations-client
+cd ship-operations-client
+yarn install
+```
+
+# Deploy
+
+To start the application, please run the following:
+```
+yarn start
+```
+
+A Browser window will appear with the following link:
+
+[http://localhost:3000](http://localhost:3000)
+
+# Unit testing and integration testing
+
+Basic unit testing and integration testing is done with Jest
+
+For unit testing, run the following:
+```
+yarn test
+```
+
+For integration testing, run the following:
+``` 
+yarn integration
+```
+
