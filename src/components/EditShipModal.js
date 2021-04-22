@@ -81,7 +81,7 @@ const EditShipModal = props => {
       <Snackbar
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
         open={snackBarOpen}
-        autoHideDuration={3000}
+        autoHideDuration={5000}
         onClose={snackBarClose}
         message={<span id='message-id'>{snackBarMsg}</span>}
         action={[

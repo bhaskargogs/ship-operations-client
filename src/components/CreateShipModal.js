@@ -5,13 +5,13 @@ import React, { useState } from 'react';
 import { Button, Col, Form, Modal, Row } from 'react-bootstrap';
 
 const CreateShipModal = props => {
-    const [snackBarOpen, isSnackBarOpen] = useState(false);
-    const [snackBarMsg, setSnackBarMsg] = useState('');
-    const [validateOnChange, setValidateOnChange] = useState(false);
+  const [snackBarOpen, isSnackBarOpen] = useState(false);
+  const [snackBarMsg, setSnackBarMsg] = useState('');
+  const [validateOnChange, setValidateOnChange] = useState(false);
 
-    const snackBarClose = event => isSnackBarOpen(false);
+  const snackBarClose = event => isSnackBarOpen(false);
 
-    const validate = values => {
+  const validate = values => {
     const errors = {};
     if (!values.name) {
       errors.name = 'Name is required';
@@ -57,16 +57,15 @@ const CreateShipModal = props => {
     },
     validate,
     onSubmit: async values => {
-        let result = await axios.post("http://localhost:8080/ships", 
-            { 
-                name: values.name,
-                length: values.length,
-                width: values.width,
-                code: values.code
-             });
-             isSnackBarOpen(true);
-             setSnackBarMsg(result.data);
-             props.onHide();
+      let result = await axios.post('http://localhost:8080/ships', {
+        name: values.name,
+        length: values.length,
+        width: values.width,
+        code: values.code,
+      });
+      isSnackBarOpen(true);
+      setSnackBarMsg(result.data);
+      props.onHide();
     },
   });
 
@@ -75,111 +74,124 @@ const CreateShipModal = props => {
     return formik.isValid ? formik.handleSubmit(e) : handleValidationError(e);
   };
 
-    return (
-        <div className="container">
-        <Snackbar anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
+  return (
+    <div className='container'>
+      <Snackbar
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
         open={snackBarOpen}
-        autoHideDuration={3000}
+        autoHideDuration={5000}
         onClose={snackBarClose}
-        message={<span id="message-id">{snackBarMsg}</span>}
+        message={<span id='message-id'>{snackBarMsg}</span>}
         action={[
-            <IconButton 
-                key="close" 
-                aria-label="Close" 
-                color="inherit" 
-                onClick={snackBarClose}>x</IconButton>
-        ]} />
-        <Modal
-      {...props}
-      size="lg"
-      aria-labelledby="contained-modal-title-vcenter"
-      centered
-    >
-      <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">
-          Create Ship
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Row>
+          <IconButton
+            key='close'
+            aria-label='Close'
+            color='inherit'
+            onClick={snackBarClose}
+          >
+            x
+          </IconButton>,
+        ]}
+      />
+      <Modal
+        {...props}
+        size='lg'
+        aria-labelledby='contained-modal-title-vcenter'
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title id='contained-modal-title-vcenter'>
+            Create Ship
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Row>
             <Col sm={6}>
-                <Form onSubmit={formSubmit}>
-                    <Form.Group controlId="Name">
-                        <Form.Label>Name</Form.Label>
-                        <Form.Control 
-                            type="text" 
-                            name="name" 
-                            onChange={formik.handleChange} 
-                            value={formik.values.name}
-                            required 
-                            isInvalid={ !!formik.errors.name }
-                            placeholder="Name"/>
-                            {formik.errors.name && (
+              <Form onSubmit={formSubmit}>
+                <Form.Group controlId='Name'>
+                  <Form.Label>Name</Form.Label>
+                  <Form.Control
+                    type='text'
+                    name='name'
+                    onChange={formik.handleChange}
+                    value={formik.values.name}
+                    required
+                    isInvalid={!!formik.errors.name}
+                    placeholder='Name'
+                  />
+                  {formik.errors.name && (
                     <Form.Control.Feedback type='invalid'>
                       {formik.errors.name}
                     </Form.Control.Feedback>
                   )}
-                    </Form.Group>
-                    <Form.Group controlId="Length">
-                        <Form.Label>Length (metres)</Form.Label>
-                        <Form.Control 
-                            type="text" 
-                            name="length" 
-                            onChange={formik.handleChange} 
-                            value={formik.values.length}
-                            required 
-                            isInvalid={ !!formik.errors.length }
-                            placeholder="Length"/>
-                            {formik.errors.length && (
+                </Form.Group>
+                <Form.Group controlId='Length'>
+                  <Form.Label>Length (metres)</Form.Label>
+                  <Form.Control
+                    type='text'
+                    name='length'
+                    onChange={formik.handleChange}
+                    value={formik.values.length}
+                    required
+                    isInvalid={!!formik.errors.length}
+                    placeholder='Length'
+                  />
+                  {formik.errors.length && (
                     <Form.Control.Feedback type='invalid'>
                       {formik.errors.length}
                     </Form.Control.Feedback>
                   )}
-                    </Form.Group>
-                    <Form.Group controlId="Width">
-                        <Form.Label>Width (metres)</Form.Label>
-                        <Form.Control 
-                        type="text" 
-                        name="width" 
-                        onChange={formik.handleChange} 
-                        value={formik.values.width}
-                        required 
-                        isInvalid={ !!formik.errors.width }
-                        placeholder="Width"/>
-                        {formik.errors.width && (
+                </Form.Group>
+                <Form.Group controlId='Width'>
+                  <Form.Label>Width (metres)</Form.Label>
+                  <Form.Control
+                    type='text'
+                    name='width'
+                    onChange={formik.handleChange}
+                    value={formik.values.width}
+                    required
+                    isInvalid={!!formik.errors.width}
+                    placeholder='Width'
+                  />
+                  {formik.errors.width && (
                     <Form.Control.Feedback type='invalid'>
                       {formik.errors.width}
                     </Form.Control.Feedback>
                   )}
-                    </Form.Group>
-                    <Form.Group controlId="Code">
-                        <Form.Label>Code (AAAA-0000-A0)</Form.Label>
-                        <Form.Control 
-                        type="text" 
-                        name="code" 
-                        onChange={formik.handleChange} 
-                        required 
-                        isInvalid={ !!formik.errors.code }
-                        placeholder="Code"/>
-                    {formik.errors.code && (
+                </Form.Group>
+                <Form.Group controlId='Code'>
+                  <Form.Label>Code (AAAA-0000-A0)</Form.Label>
+                  <Form.Control
+                    type='text'
+                    name='code'
+                    onChange={formik.handleChange}
+                    required
+                    isInvalid={!!formik.errors.code}
+                    placeholder='Code'
+                  />
+                  {formik.errors.code && (
                     <Form.Control.Feedback type='invalid'>
                       {formik.errors.code}
                     </Form.Control.Feedback>
                   )}
-                    </Form.Group>
-                    <Form.Group>
-                        <Button variant="primary" type="submit">Create Ship</Button>
-                    </Form.Group>
-                </Form>
+                </Form.Group>
+                <Form.Group>
+                  <Button variant='primary' type='submit'>
+                    Create Ship
+                  </Button>
+                </Form.Group>
+              </Form>
             </Col>
-        </Row>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="danger" onClick={props.onHide}>Close</Button>
-      </Modal.Footer>
-    </Modal>
+          </Row>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant='danger' onClick={props.onHide}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
-    );
-}
+  );
+};
 
 export default CreateShipModal;
