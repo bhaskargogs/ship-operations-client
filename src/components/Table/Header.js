@@ -22,6 +22,7 @@ const Header = ({ headers, onSorting }) => {
       <tr>
         {headers.map(({ name, field, sortable }) => (
           <th
+            style={{ cursor: 'pointer' }}
             key={name}
             onClick={() => (sortable ? onSortingChange(field) : null)}
           >

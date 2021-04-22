@@ -78,8 +78,7 @@ const Ships = props => {
   return (
     <div>
       <div className='row mt-5'>
-        <div className='col-md-4'></div>
-        <div className='col-md-6'>
+        <div className='col-md-5'>
           <PaginationComponent
             total={totalShips}
             itemsPerPage={shipsPerPage}
@@ -88,6 +87,15 @@ const Ships = props => {
               setCurrentPage(page);
             }}
           />
+        </div>
+        <div className='col-md-5'></div>
+        <div className='col-md-2'>
+          <ButtonToolbar>
+            <Button variant='primary' onClick={() => setCreateShowModal(true)}>
+              Create Ship
+            </Button>
+            <CreateShipModal show={createShowModal} onHide={createModalClose} />
+          </ButtonToolbar>
         </div>
         <div className='col-md-6'></div>
       </div>
@@ -145,12 +153,6 @@ const Ships = props => {
           ))}
         </tbody>
       </Table>
-      <ButtonToolbar>
-        <Button variant='primary' onClick={() => setCreateShowModal(true)}>
-          Create Ship
-        </Button>
-        <CreateShipModal show={createShowModal} onHide={createModalClose} />
-      </ButtonToolbar>
     </div>
   );
 };
