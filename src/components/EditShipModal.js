@@ -44,6 +44,7 @@ const EditShipModal = props => {
   const handleValidationError = () => {
     isSnackBarOpen(true);
     setSnackBarMsg('Failed due to validation errors');
+    alert('Failed due to validation errors');
   };
 
   const formik = useFormik({
