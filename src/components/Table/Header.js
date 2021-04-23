@@ -30,7 +30,7 @@ const Header = ({ headers, onSorting }) => {
 
             {sortingField && sortingField === field && (
               <FontAwesomeIcon
-                icon={sortingOrder === 'asc' ? 'arrow-down' : 'arrow-up'}
+                icon={sortingOrder === 'asc' ? 'arrow-up' : 'arrow-down'}
               />
             )}
           </th>
