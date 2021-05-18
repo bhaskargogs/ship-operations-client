@@ -106,7 +106,7 @@ const Ships = props => {
             setTimeout(() => {
               setDirection(order);
               setSortField(field);
-            }, 3000);
+            }, 1000);
           }}
         />
         <tbody>
